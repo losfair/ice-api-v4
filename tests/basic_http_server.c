@@ -16,6 +16,19 @@ void hello_world_callback(
     ice_http_server_endpoint_context_end_with_response(ctx, resp);
 }
 
+void default_callback(
+    IceHttpEndpointContext ctx,
+    IceHttpRequest req,
+    void *call_with
+) {
+    IceHttpResponse resp = ice_http_response_create();
+    const char *body = "Not found\n";
+
+    ice_http_response_set_body(resp, (const ice_uint8_t *) body, strlen(body));
+    ice_http_response_set_status(resp, 404);
+    ice_http_server_endpoint_context_end_with_response(ctx, resp);
+}
+
 int main(int argc, const char *argv[]) {
     if(argc < 2) {
         fprintf(stderr, "Listen address required");
@@ -39,6 +52,9 @@ int main(int argc, const char *argv[]) {
 
     IceHttpRouteInfo hello_world_route = ice_http_server_route_create("/hello_world", hello_world_callback, NULL);
     ice_http_server_add_route(server, hello_world_route);
+
+    IceHttpRouteInfo default_route = ice_http_server_route_create("", default_callback, NULL);
+    ice_http_server_set_default_route(server, default_route);
 
     while(1) {
         sleep(10000000);

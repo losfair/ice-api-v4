@@ -73,6 +73,10 @@ void ice_http_server_add_route(
     IceHttpServer server,
     IceHttpRouteInfo rt
 );
+void ice_http_server_set_default_route(
+    IceHttpServer server,
+    IceHttpRouteInfo rt
+);
 IceHttpResponse ice_http_response_create();
 void ice_http_response_destroy(
     IceHttpResponse resp
