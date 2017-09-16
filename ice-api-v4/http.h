@@ -2,6 +2,7 @@
 #define _ICE_API_HTTP_H_
 
 #include "types.h"
+#include "rstream.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -105,6 +106,10 @@ void ice_http_response_append_header(
     IceHttpResponse resp,
     const char *k,
     const char *v
+);
+void ice_http_response_attach_rstream(
+    IceHttpResponse resp,
+    IceReadStream stream
 );
 void ice_http_server_endpoint_context_end_with_response(
     IceHttpEndpointContext ctx,

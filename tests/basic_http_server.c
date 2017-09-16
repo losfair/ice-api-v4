@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <ice-api-v4/init.h>
 #include <ice-api-v4/http.h>
+#include <ice-api-v4/stream.h>
+#include <ice-api-v4/wstream.h>
 
 void print_kvp(const char *k, const char *v, void *call_with) {
     printf("%s -> %s\n", k, v);
@@ -17,6 +19,25 @@ void hello_world_callback(
     const char *body = "Hello world!\n";
 
     ice_http_response_set_body(resp, (const ice_uint8_t *) body, strlen(body));
+    ice_http_server_endpoint_context_end_with_response(ctx, resp);
+}
+
+void stream_callback(
+    IceHttpEndpointContext ctx,
+    IceHttpRequest req,
+    void *call_with
+) {
+    IceHttpResponse resp = ice_http_response_create();
+    const char *body = "Hello world! (stream)\n";
+
+    struct IceStreamTxRxPair p;
+    ice_stream_create_pair(&p);
+
+    ice_http_response_attach_rstream(resp, p.rx);
+
+    ice_stream_wstream_write(p.tx, (const ice_uint8_t *) body, strlen(body));
+    ice_stream_wstream_destroy(p.tx);
+
     ice_http_server_endpoint_context_end_with_response(ctx, resp);
 }
 
@@ -76,6 +97,9 @@ int main(int argc, const char *argv[]) {
 
     IceHttpRouteInfo debug_route = ice_http_server_route_create("/debug", debug_callback, NULL);
     ice_http_server_add_route(server, debug_route);
+
+    IceHttpRouteInfo stream_route = ice_http_server_route_create("/stream", stream_callback, NULL);
+    ice_http_server_add_route(server, stream_route);
 
     while(1) {
         sleep(10000000);
