@@ -1,6 +1,20 @@
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
+#include <ice-api-v4/init.h>
 #include <ice-api-v4/http.h>
+
+void hello_world_callback(
+    IceHttpEndpointContext ctx,
+    IceHttpRequest req,
+    void *call_with
+) {
+    IceHttpResponse resp = ice_http_response_create();
+    const char *body = "Hello world!\n";
+
+    ice_http_response_set_body(resp, (const ice_uint8_t *) body, strlen(body));
+    ice_http_server_endpoint_context_end_with_response(ctx, resp);
+}
 
 int main(int argc, const char *argv[]) {
     if(argc < 2) {
@@ -22,6 +36,9 @@ int main(int argc, const char *argv[]) {
 
     IceHttpServer server = ice_http_server_create(cfg);
     ice_http_server_start(server);
+
+    IceHttpRouteInfo hello_world_route = ice_http_server_route_create("/hello_world", hello_world_callback, NULL);
+    ice_http_server_add_route(server, hello_world_route);
 
     while(1) {
         sleep(10000000);
