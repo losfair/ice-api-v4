@@ -4,6 +4,10 @@
 #include <ice-api-v4/init.h>
 #include <ice-api-v4/http.h>
 
+void print_kvp(const char *k, const char *v, void *call_with) {
+    printf("%s -> %s\n", k, v);
+}
+
 void hello_world_callback(
     IceHttpEndpointContext ctx,
     IceHttpRequest req,
@@ -11,6 +15,20 @@ void hello_world_callback(
 ) {
     IceHttpResponse resp = ice_http_response_create();
     const char *body = "Hello world!\n";
+
+    ice_http_response_set_body(resp, (const ice_uint8_t *) body, strlen(body));
+    ice_http_server_endpoint_context_end_with_response(ctx, resp);
+}
+
+void debug_callback(
+    IceHttpEndpointContext ctx,
+    IceHttpRequest req,
+    void *call_with
+) {
+    IceHttpResponse resp = ice_http_response_create();
+    const char *body = "OK\n";
+
+    ice_http_request_iter_headers(req, print_kvp, NULL);
 
     ice_http_response_set_body(resp, (const ice_uint8_t *) body, strlen(body));
     ice_http_server_endpoint_context_end_with_response(ctx, resp);
@@ -55,6 +73,9 @@ int main(int argc, const char *argv[]) {
 
     IceHttpRouteInfo default_route = ice_http_server_route_create("", default_callback, NULL);
     ice_http_server_set_default_route(server, default_route);
+
+    IceHttpRouteInfo debug_route = ice_http_server_route_create("/debug", debug_callback, NULL);
+    ice_http_server_add_route(server, debug_route);
 
     while(1) {
         sleep(10000000);

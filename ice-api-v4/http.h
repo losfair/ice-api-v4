@@ -45,6 +45,12 @@ typedef void (*IceHttpReadBodyCallbackOnEnd) (
     void *call_with
 );
 
+typedef void (*IceHttpKeyValueIterInstantCallback) (
+    const char *key,
+    const char *value,
+    void *call_with
+);
+
 IceHttpServerConfig ice_http_server_config_create();
 void ice_http_server_config_destroy(IceHttpServerConfig cfg);
 void ice_http_server_config_set_listen_addr(
@@ -122,6 +128,11 @@ ice_owned_string_t ice_http_request_get_remote_addr_to_owned(
 ice_owned_string_t ice_http_request_get_header_to_owned(
     IceHttpRequest req,
     const char *k
+);
+void ice_http_request_iter_headers(
+    IceHttpRequest req,
+    IceHttpKeyValueIterInstantCallback cb,
+    void *call_with
 );
 void ice_http_request_take_and_read_body(
     IceHttpRequest req,
