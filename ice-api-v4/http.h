@@ -35,7 +35,7 @@ typedef void (*IceHttpRouteCallback) (
     void *
 );
 
-typedef void (*IceHttpReadBodyCallbackOnData) (
+typedef ice_uint8_t (*IceHttpReadBodyCallbackOnData) (
     const ice_uint8_t *data,
     ice_uint32_t len,
     void *call_with
@@ -115,7 +115,7 @@ void ice_http_server_endpoint_context_end_with_response(
     IceHttpEndpointContext ctx,
     IceHttpResponse resp
 );
-void ice_http_server_endpoint_context_take_request(
+IceHttpRequest ice_http_server_endpoint_context_take_request(
     IceHttpEndpointContext ctx
 );
 void ice_http_request_destroy(
