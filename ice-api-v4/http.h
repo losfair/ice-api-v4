@@ -145,6 +145,11 @@ void ice_http_request_take_and_read_body(
     IceHttpReadBodyCallbackOnEnd cb_on_end,
     void *call_with
 );
+void ice_storage_file_http_response_begin_send(
+    IceHttpRequest req,
+    IceHttpResponse resp,
+    const char *path
+);
 
 #ifdef __cplusplus
 }

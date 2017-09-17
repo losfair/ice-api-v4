@@ -2,6 +2,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <ice-api-v4/init.h>
+#include <ice-api-v4/glue.h>
+#include <ice-api-v4/view.h>
 #include <ice-api-v4/http.h>
 #include <ice-api-v4/stream.h>
 #include <ice-api-v4/wstream.h>
@@ -68,6 +70,16 @@ void default_callback(
     ice_http_server_endpoint_context_end_with_response(ctx, resp);
 }
 
+void send_file_callback(
+    IceHttpEndpointContext ctx,
+    IceHttpRequest req,
+    void *call_with
+) {
+    IceHttpResponse resp = ice_http_response_create();
+    ice_storage_file_http_response_begin_send(req, resp, "basic_http_server.c");
+    ice_http_server_endpoint_context_end_with_response(ctx, resp);
+}
+
 int main(int argc, const char *argv[]) {
     if(argc < 2) {
         fprintf(stderr, "Listen address required");
@@ -75,6 +87,21 @@ int main(int argc, const char *argv[]) {
     }
 
     const char *listen_addr = argv[1];
+
+    IceHtmlTemplateEngine template_engine = ice_view_html_template_create_engine("tera");
+    ice_view_html_template_add(
+        template_engine,
+        "test.html",
+        "Hello {{ name }}"
+    );
+    ice_owned_string_t render_output = ice_view_html_template_render_json_to_owned(
+        template_engine,
+        "test.html",
+        "{\"name\":\"user\"}"
+    );
+    printf("%s\n", render_output);
+    ice_glue_destroy_cstring(render_output);
+    ice_view_html_template_destroy_engine(template_engine);
 
     IceHttpServerConfig cfg = ice_http_server_config_create();
     ice_http_server_config_set_listen_addr(
@@ -100,6 +127,9 @@ int main(int argc, const char *argv[]) {
 
     IceHttpRouteInfo stream_route = ice_http_server_route_create("/stream", stream_callback, NULL);
     ice_http_server_add_route(server, stream_route);
+
+    IceHttpRouteInfo send_file_route = ice_http_server_route_create("/send_file", send_file_callback, NULL);
+    ice_http_server_add_route(server, send_file_route);
 
     while(1) {
         sleep(10000000);
