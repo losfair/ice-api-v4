@@ -64,7 +64,7 @@ void ice_storage_kv_hash_map_ext_set(
     IceKVStorageHashMapExt hm,
     const char *k,
     const char *map_key,
-    const char *v
+    const char *v,
     IceKVStorageSetItemCallback cb,
     void *call_with
 );
