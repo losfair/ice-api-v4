@@ -67,8 +67,10 @@ ice_int32_t ice_rpc_param_get_i32(IceRpcParam p);
 double ice_rpc_param_get_f64(IceRpcParam p);
 ice_owned_string_t ice_rpc_param_get_string_to_owned(IceRpcParam p);
 ice_uint8_t ice_rpc_param_get_bool(IceRpcParam p);
+IceRpcParam ice_rpc_param_get_error(IceRpcParam p);
 ice_uint8_t ice_rpc_param_is_null(IceRpcParam p);
 void ice_rpc_param_destroy(IceRpcParam p);
+IceRpcParam ice_rpc_param_clone(IceRpcParam p);
 
 IceRpcClient ice_rpc_client_create(const char *addr);
 void ice_rpc_client_destroy(IceRpcClient client);
